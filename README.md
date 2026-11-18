@@ -43,7 +43,7 @@ Create a folder with two files.
 ```yaml
 services:
   ntp-dashboard:
-    image: <dockerhub-user>/ntp-dashboard:latest   # or ghcr.io/<you>/ntp-dashboard:latest
+    image: atomizeee/ntp-dashboard:latest   # or ghcr.io/<you>/ntp-dashboard:latest
     container_name: ntp-dashboard
     restart: unless-stopped
     init: true
