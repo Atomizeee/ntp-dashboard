@@ -3,7 +3,7 @@
 # Replace the image name with your own, e.g. ghcr.io/<you>/ntp-dashboard:latest
 services:
   ntp-dashboard:
-    image: ghcr.io/<you>/ntp-dashboard:latest
+    image: ghcr.io/atomizeee/ntp-dashboard:latest
     container_name: ntp-dashboard
     restart: unless-stopped
     init: true
