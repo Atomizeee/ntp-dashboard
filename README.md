@@ -34,6 +34,20 @@ The mode is detected automatically (`SERVER_TYPE=auto`). If detection can't read
 
 ## Quick start
 
+### Option A: ready-made image
+
+```bash
+mkdir ntp-dashboard && cd ntp-dashboard
+curl -fsSLO https://raw.githubusercontent.com/<you>/ntp-dashboard/main/docker-compose.hub.yml
+curl -fsSL https://raw.githubusercontent.com/<you>/ntp-dashboard/main/.env.example -o .env
+nano .env                     # set SERVER_HOST
+docker compose -f docker-compose.hub.yml up -d
+```
+
+The image is published for amd64 and arm64 as `ghcr.io/<you>/ntp-dashboard` and `<dockerhub-user>/ntp-dashboard`.
+
+### Option B: build from source
+
 You need Docker with the Compose plugin on any machine that can reach the NTP server.
 
 ```bash

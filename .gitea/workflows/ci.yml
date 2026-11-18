@@ -12,10 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - run: python -m unittest discover -s tests -t . -v
+      - name: Unit tests (Python 3.13 in Docker)
+        run: |
+          cid=$(docker create -w /src python:3.13-alpine python -m unittest discover -s tests -t . -v)
+          docker cp . "$cid":/src
+          docker start -a "$cid"; rc=$?
+          docker rm "$cid" >/dev/null
+          exit $rc
       - name: JavaScript syntax check
         run: |
           if command -v node >/dev/null; then node --check app/static/app.js; else echo "node not installed, skipped"; fi
