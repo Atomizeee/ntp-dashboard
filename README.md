@@ -34,24 +34,57 @@ The mode is detected automatically (`SERVER_TYPE=auto`). If detection can't read
 
 ## Quick start
 
-### Option A: ready-made image
+### Option A: ready-made image (no build)
 
-```bash
-mkdir ntp-dashboard && cd ntp-dashboard
-curl -fsSLO https://raw.githubusercontent.com/atomizeee/ntp-dashboard/main/docker-compose.hub.yml
-curl -fsSL https://raw.githubusercontent.com/atomizeee/ntp-dashboard/main/.env.example -o .env
-nano .env                     # set SERVER_HOST
-docker compose -f docker-compose.hub.yml up -d
+Create a folder with two files.
+
+`docker-compose.yml`:
+
+```yaml
+services:
+  ntp-dashboard:
+    image: <dockerhub-user>/ntp-dashboard:latest   # or ghcr.io/<you>/ntp-dashboard:latest
+    container_name: ntp-dashboard
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ntp-dashboard-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  ntp-dashboard-data:
 ```
 
-The image is published for amd64 and arm64 as `ghcr.io/atomizeee/ntp-dashboard` and `<dockerhub-user>/ntp-dashboard`.
+`.env` (only `SERVER_HOST` is required; the full list is in [`.env.example`](.env.example)):
+
+```env
+SERVER_NAME=Home NTP server
+SERVER_HOST=192.168.1.10
+```
+
+Then start it and open `http://<docker-host>:8080`:
+
+```bash
+docker compose up -d
+```
+
+Running on the same machine as the NTP server? Replace the `ports:` block with `network_mode: host`, set `SERVER_HOST=127.0.0.1`, and add `PORT=8080` to `.env`.
 
 ### Option B: build from source
 
 You need Docker with the Compose plugin on any machine that can reach the NTP server.
 
 ```bash
-git clone https://github.com/atomizeee/ntp-dashboard.git
+git clone https://github.com/<you>/ntp-dashboard.git
 cd ntp-dashboard
 cp .env.example .env          # set SERVER_HOST to your NTP server's IP or name
 docker compose up -d --build
