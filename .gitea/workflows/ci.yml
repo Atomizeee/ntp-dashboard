@@ -1,3 +1,5 @@
+# Gitea Actions (act_runner). Gitea uses this file instead of .github/workflows/ci.yml.
+# Runs the tests and checks that the image builds. It does not publish anything.
 name: ci
 
 on:
@@ -10,20 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Unit tests (Python 3.13 in Docker)
-        run: |
-          cid=$(docker create -w /src python:3.13-alpine python -m unittest discover -s tests -t . -v)
-          docker cp . "$cid":/src
-          docker start -a "$cid"; rc=$?
-          docker rm "$cid" >/dev/null
-          exit $rc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m unittest discover -s tests -t . -v
       - name: JavaScript syntax check
         run: |
           if command -v node >/dev/null; then node --check app/static/app.js; else echo "node not installed, skipped"; fi
 
   image:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   # needs a runner that can use Docker
     steps:
       - uses: actions/checkout@v4
       - name: Build image

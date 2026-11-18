@@ -1,4 +1,4 @@
-1# NTP Dashboard
+# NTP Dashboard
 
 A self-hosted, one-page web dashboard for **any NTP server**: a GPS/PPS-disciplined chrony box, a Proxmox host syncing to a pool, a pfSense or OPNsense firewall, or a plain Linux server running chrony or ntpd.
 
