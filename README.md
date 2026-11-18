@@ -84,7 +84,7 @@ Running on the same machine as the NTP server? Replace the `ports:` block with `
 You need Docker with the Compose plugin on any machine that can reach the NTP server.
 
 ```bash
-git clone https://github.com/<you>/ntp-dashboard.git
+git clone https://github.com/atomizeee/ntp-dashboard.git
 cd ntp-dashboard
 cp .env.example .env          # set SERVER_HOST to your NTP server's IP or name
 docker compose up -d --build
