@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NTP monitor</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <div class="name" id="server-name">NTP monitor</div>
+    <div class="sub" id="server-host"></div>
+  </div>
+  <div class="top-right">
+    <span class="conn" id="conn" data-state="wait">connecting</span>
+    <button id="theme-btn" type="button" title="Switch theme">Theme: auto</button>
+  </div>
+</header>
+
+<main>
+  <section class="banner" id="banner" data-level="wait" aria-live="polite">
+    <div class="banner-mark" id="banner-mark">…</div>
+    <div class="banner-text">
+      <h1 id="banner-title">Connecting…</h1>
+      <p id="banner-sub"></p>
+    </div>
+  </section>
+  <ul class="checks" id="checks"></ul>
+
+  <div class="grid">
+    <section class="card clock-card">
+      <h2>Browser clock vs NTP server</h2>
+      <div class="clock-row"><span class="lbl">NTP server time</span><span class="clock" id="clk-ntp">—</span></div>
+      <div class="clock-row"><span class="lbl">This browser</span><span class="clock" id="clk-browser">—</span></div>
+      <div class="clock-diff" id="clk-diff">measuring…</div>
+      <div class="clock-meta" id="clk-meta"></div>
+      <canvas id="ch-browser" class="spark" height="70"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Accuracy</h2>
+      <dl class="kpis" id="kpis"></dl>
+    </section>
+
+    <section class="card">
+      <h2>Latency to server <span class="hint" id="probe-host"></span></h2>
+      <dl class="kpis" id="lat-kpis"></dl>
+    </section>
+
+    <section class="card wide map-card" id="map-card" hidden>
+      <h2>Satellites on the map <span class="hint">approximate ground points, not orbits</span></h2>
+      <div class="map-tools">
+        <label><input type="checkbox" id="map-lines" checked> lines to used satellites</label>
+        <button type="button" id="map-fit">Fit all</button>
+      </div>
+      <div id="map" class="map"></div>
+      <div id="map-note" class="note"></div>
+    </section>
+
+    <section class="card sky-card" id="sky-card" hidden>
+      <h2>Sky view</h2>
+      <svg id="sky" viewBox="0 0 300 300" role="img" aria-label="Satellite sky plot"></svg>
+      <div class="legend" id="sky-legend"></div>
+    </section>
+
+    <section class="card full">
+      <div class="chart-head">
+        <h2>History</h2>
+        <div class="range" id="range" role="group" aria-label="Time range">
+          <button type="button" data-s="3600" aria-pressed="true">1 h</button>
+          <button type="button" data-s="21600" aria-pressed="false">6 h</button>
+          <button type="button" data-s="86400" aria-pressed="false">24 h</button>
+          <button type="button" data-s="604800" aria-pressed="false">7 d</button>
+        </div>
+      </div>
+      <div class="charts" id="charts"></div>
+    </section>
+
+    <section class="card wide" id="sources-card">
+      <h2>Time sources <span class="hint" id="sources-hint"></span></h2>
+      <div class="scroll"><table id="sources"></table></div>
+    </section>
+
+    <section class="card" id="refs-card" hidden>
+      <h2>Public servers <span class="hint">independent cross-check</span></h2>
+      <div class="scroll"><table id="refs-table"></table></div>
+      <div class="note" id="refs-note"></div>
+    </section>
+
+    <section class="card" id="sat-card" hidden>
+      <h2>Satellites <span class="hint" id="sat-count"></span></h2>
+      <div class="scroll tall"><table id="sat-table"></table></div>
+    </section>
+
+    <section class="card" id="gps-card" hidden>
+      <h2>GPS receiver</h2>
+      <dl class="kpis" id="gps-kpis"></dl>
+    </section>
+
+    <section class="card" id="srv-card" hidden>
+      <h2>NTP clients served</h2>
+      <dl class="kpis" id="srv-kpis"></dl>
+    </section>
+
+    <section class="card">
+      <h2>Events</h2>
+      <ul class="events" id="events"></ul>
+    </section>
+  </div>
+</main>
+<footer>
+  <span id="ver"></span> · <a href="/api/status">status json</a> · <a href="/api/raw">raw server output</a>
+</footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

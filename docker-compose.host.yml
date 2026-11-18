@@ -1,0 +1,25 @@
+# Same container, but sharing the host's network. Use it on the machine that runs
+# your NTP server (and gpsd), so SERVER_HOST=127.0.0.1 just works.
+# Set PORT in .env to change the web port (default 8080).
+#   docker compose -f docker-compose.host.yml up -d --build
+services:
+  ntp-dashboard:
+    build: .
+    image: ntp-dashboard:local
+    container_name: ntp-dashboard
+    restart: unless-stopped
+    init: true
+    network_mode: host
+    env_file: .env
+    volumes:
+      - ntp-dashboard-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  ntp-dashboard-data:

@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""Stand-in for `chronyc -c <cmd>` that prints plausible, slowly changing CSV.
+
+FAKE_CHRONY_SCENARIO=gps (default): PPS-disciplined server.  =network: synchronised to public servers.
+"""
+import math
+import os
+import sys
+import time
+
+scenario = os.environ.get("FAKE_CHRONY_SCENARIO", "gps")
+cmd = [a for a in sys.argv[1:] if a in ("tracking", "sources", "sourcestats", "serverstats")]
+cmd = cmd[0] if cmd else ""
+t = time.time()
+j = lambda scale, ph=0: math.sin(t / 9 + ph) * scale
+
+if scenario == "network":
+    if cmd == "tracking":
+        print(f"A29FC801,time.cloudflare.com,3,{t - 31:.6f},{0.000041 + j(1e-5):.9f},{j(3.1e-4, 1):.9f},0.000412000,"
+              f"-3.912,0.012,0.213,0.018214000,0.001207000,64.0,Normal")
+    elif cmd == "sources":
+        print(f"^,*,time.cloudflare.com,3,6,377,22,{j(2e-4):.9f},{j(2e-4, 2):.9f},0.011000000")
+        print("^,+,time.google.com,1,6,377,35,0.000221000,0.000221000,0.013000000")
+        print("^,+,ntp1.example.net,2,6,377,12,0.001034000,0.001034000,0.016000000")
+        print("^,+,ntp2.example.net,2,6,377,48,-0.000380000,-0.000380000,0.019000000")
+        print("^,-,ntp3.example.net,2,6,357,5,0.006820000,0.006820000,0.024000000")
+    elif cmd == "sourcestats":
+        print("time.cloudflare.com,24,13,1520,-0.034,0.221,0.000041000,0.000412000")
+        print("time.google.com,22,11,1480,-0.029,0.301,0.000221000,0.000388000")
+        print("ntp1.example.net,20,9,1390,-0.041,0.412,0.001034000,0.000912000")
+        print("ntp2.example.net,23,12,1500,-0.022,0.280,-0.000380000,0.000602000")
+        print("ntp3.example.net,19,8,1310,-0.050,0.533,0.006820000,0.002900000")
+    else:
+        print("501 Not authorised", file=sys.stderr)
+        sys.exit(1)
+    sys.exit(0)
+
+if cmd == "tracking":
+    print(f"50505300,PPS,1,{t - 8:.6f},{0.000000300 + j(2e-7):.9f},{j(1.5e-6, 1):.9f},{0.000000978:.9f},"
+          f"-8.256,{-0.001:.3f},0.064,0.000000001,0.000030739,16.0,Normal")
+elif cmd == "sources":
+    print(f"#,*,PPS,0,4,377,5,{j(8e-7):.9f},{j(1e-6, 2):.9f},0.000000500")
+    print(f"#,-,NMEA,0,4,377,9,0.091000000,0.091000000,0.200000000")
+    print(f"^,-,198.51.100.7,2,6,377,41,-0.001440000,-0.001440000,0.024000000")
+    print(f"^,-,198.51.100.8,1,6,377,12,0.000139000,0.000139000,0.025000000")
+    print(f"^,-,203.0.113.5,2,6,357,{int(t) % 60},-0.004480000,-0.004480000,0.027000000")
+elif cmd == "sourcestats":
+    print(f"PPS,13,7,194,-0.001,0.064,{j(5e-9):.9f},0.000002914")
+    print("NMEA,16,10,241,3.120,10.436,0.091000000,0.000746000")
+    print("198.51.100.7,30,18,5280,0.543,0.407,0.001440000,0.000746000")
+    print("198.51.100.8,32,15,5220,0.467,0.285,0.000139000,0.000605000")
+    print("203.0.113.5,13,6,5820,0.507,0.764,-0.004480000,0.001250000")
+elif cmd == "serverstats":
+    print(f"{int(t * 3)},{int(t) // 400},0,0,0,0,0,0,0,0,0")
+else:
+    print("506 Cannot talk to daemon", file=sys.stderr)
+    sys.exit(1)
